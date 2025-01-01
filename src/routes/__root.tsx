@@ -1,6 +1,13 @@
-const App = () => {
+import * as React from 'react';
+import { Outlet, createRootRoute } from '@tanstack/react-router';
+
+export const Route = createRootRoute({
+  component: RootComponent,
+});
+
+function RootComponent() {
   return (
-    <>
+    <React.Fragment>
       <header
         style={{
           backgroundColor: '#007bff',
@@ -16,14 +23,8 @@ const App = () => {
           padding: '.5rem',
         }}
       >
-        <h2>Content Section</h2>
-        <p>
-          This layout maintains mobile dimensions (320px-420px) across all
-          screen sizes while staying centered on larger screens.
-        </p>
+        <Outlet />
       </section>
-    </>
+    </React.Fragment>
   );
-};
-
-export default App;
+}
