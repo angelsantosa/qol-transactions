@@ -1,0 +1,21 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #f0f0f0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+}
+
+.app {
+  background-color: white;
+  width: 100%;
+  min-width: 320px; /* iPhone 5 width */
+  max-width: 430px; /* Typical max mobile width */
+  min-height: 100vh;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
