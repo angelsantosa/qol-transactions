@@ -2,27 +2,30 @@
   "name": "qol-transactions",
   "private": true,
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
-    "build": "rsbuild build",
     "check": "biome check --write",
-    "dev": "rsbuild dev --open",
     "format": "biome format --write",
-    "preview": "rsbuild preview"
+    "dev": "vinxi dev",
+    "build": "vinxi build",
+    "start": "vinxi start"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.62.11",
     "@tanstack/react-router": "^1.93.0",
+    "@tanstack/start": "^1.93.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-hook-form": "^7.54.2"
+    "react-hook-form": "^7.54.2",
+    "vinxi": "^0.5.1"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.3",
-    "@rsbuild/core": "^1.1.8",
-    "@rsbuild/plugin-react": "^1.0.7",
     "@tanstack/router-plugin": "^1.93.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "tailwindcss": "^3.4.17",
     "typescript": "^5.7.2"
   }
 }
