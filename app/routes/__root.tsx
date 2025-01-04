@@ -5,6 +5,7 @@ import {
 } from '@tanstack/react-router';
 import { Meta, Scripts } from '@tanstack/start';
 import type { ReactNode } from 'react';
+import mainCss from '@/main.css?url';
 
 export const Route = createRootRoute({
   head: () => ({
@@ -20,6 +21,7 @@ export const Route = createRootRoute({
         title: 'qol-transactions',
       },
     ],
+    links: [{ rel: 'stylesheet', href: mainCss }],
   }),
   component: RootComponent,
 });
@@ -39,24 +41,11 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         <Meta />
       </head>
       <body>
-        <div className="app">
-          <header
-            style={{
-              backgroundColor: '#007bff',
-              color: 'white',
-              padding: '1rem',
-              textAlign: 'center',
-            }}
-          >
-            <h1>Mobile First Layout</h1>
+        <div className="bg-background text-foreground w-full min-w-80 max-w-[430px] min-h-screen shadow-md">
+          <header className="bg-orange-100 p-4 text-center">
+            <h1>qol-transactions</h1>
           </header>
-          <section
-            style={{
-              padding: '.5rem',
-            }}
-          >
-            {children}
-          </section>
+          <section className="p-2">{children}</section>
         </div>
         <ScrollRestoration />
         <Scripts />
