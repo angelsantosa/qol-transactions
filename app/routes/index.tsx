@@ -1,7 +1,21 @@
 import * as fs from 'node:fs';
-import { createFileRoute, useRouter } from '@tanstack/react-router';
+import * as React from 'react';
+import { createFileRoute } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/start';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { RadioButton } from '@/components/ui/radio-button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
 
 const filePath = 'count.txt';
 
@@ -17,33 +31,192 @@ const getCount = createServerFn({
   return readCount();
 });
 
-const updateCount = createServerFn({ method: 'POST' })
-  .validator((d: number) => d)
-  .handler(async ({ data }) => {
-    const count = await readCount();
-    await fs.promises.writeFile(filePath, `${count + data}`);
-  });
-
 export const Route = createFileRoute('/')({
   component: Home,
   loader: async () => await getCount(),
 });
 
+const categories = [
+  { id: 1, name: 'Food & Drinks', icon: 'utensils' },
+  { id: 2, name: 'Transportation', icon: 'car' },
+  { id: 3, name: 'Entertainment', icon: 'tv' },
+  { id: 4, name: 'Shopping & Retail', icon: 'shopping-bag' },
+  { id: 5, name: 'Bills & Utilities', icon: 'file-text' },
+  { id: 6, name: 'Health & Medical', icon: 'heart' },
+  { id: 7, name: 'Professional Development & Training', icon: 'briefcase' },
+  { id: 8, name: 'Educational Resources & Online Courses', icon: 'book-open' },
+  { id: 9, name: 'Personal Care & Wellness Activities', icon: 'smile' },
+];
+
+const accounts = [
+  { id: 1, name: 'BBVA Azul', icon: 'credit-card' },
+  { id: 2, name: 'BBVA Rojo', icon: 'credit-card' },
+  { id: 3, name: 'BBVA Negro', icon: 'credit-card' },
+  { id: 4, name: 'BBVA Morado', icon: 'credit-card' },
+];
+
+type FormData = {
+  amount: string;
+  category: string;
+  withdrawal_account: string;
+  expense_account: string;
+  description: string;
+};
+
 function Home() {
-  const router = useRouter();
-  const state = Route.useLoaderData();
+  const { register, control, watch, handleSubmit } = useForm<FormData>({});
+
+  const fields = watch();
+
+  const onSubmit: SubmitHandler<FormData> = (data) => {
+    console.log(data);
+  };
 
   return (
-    <Button
-      type="button"
-      variant={"default"}
-      onClick={() => {
-        updateCount({ data: 1 }).then(() => {
-          router.invalidate();
-        });
-      }}
-    >
-      Add 1 to {state}?
-    </Button>
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <h2 className="text-2xl">Nuevo retiro (withdrawal)</h2>
+      <div className="space-y-3">
+        <Label htmlFor="category">Categoria</Label>
+        <Controller
+          name="category"
+          control={control}
+          rules={{ required: true }}
+          render={({ field }) => {
+            return (
+              <div className="grid grid-cols-3 gap-4">
+                {categories.map((category) => (
+                  <RadioButton
+                    key={category.id}
+                    active={field.value === category.name}
+                    onClick={() => {
+                      field.onChange(category.name);
+                    }}
+                    icon={<CreditCard />}
+                    value={category.name}
+                    name="category"
+                  />
+                ))}
+              </div>
+            );
+          }}
+        />
+      </div>
+      <div className="space-y-3">
+        <div>
+          <Label htmlFor="category">Cuenta de gastos</Label>
+          <p className="text-sm text-muted-foreground">
+            {'Hace referencia a la la entidad que recibe el gasto.'}
+          </p>
+        </div>
+        <Controller
+          name="expense_account"
+          control={control}
+          rules={{ required: true }}
+          render={({ field }) => {
+            return (
+              <div className="grid grid-cols-3 gap-4">
+                {categories.map((category) => (
+                  <RadioButton
+                    key={category.id}
+                    active={field.value === category.name}
+                    onClick={() => {
+                      field.onChange(category.name);
+                    }}
+                    icon={<CreditCard />}
+                    value={category.name}
+                    name="expense_account"
+                  />
+                ))}
+              </div>
+            );
+          }}
+        />
+      </div>
+
+      <div className="space-y-3">
+        <div>
+          <Label htmlFor="withdrawal_account">Cuenta de retiro</Label>
+          <p className="text-sm text-muted-foreground">
+            {'Hace referencia a la cuenta que hizo el retiro.'}
+          </p>
+        </div>
+        <Controller
+          name="withdrawal_account"
+          control={control}
+          rules={{ required: true }}
+          render={({ field }) => {
+            return (
+              <div ref={field.ref} className="flex gap-2 flex-col">
+                {accounts.map((account) => (
+                  <RadioButton
+                    key={account.id}
+                    active={field.value === account.name}
+                    onClick={() => {
+                      field.onChange(account.name);
+                    }}
+                    icon={<CreditCard />}
+                    value={account.name}
+                    orientation="horizontal"
+                    name="withdrawal_account"
+                  />
+                ))}
+              </div>
+            );
+          }}
+        />
+      </div>
+
+      <Card className="rounded-none">
+        <CardHeader>
+          <CardTitle>Resumen</CardTitle>
+          <CardDescription>Verifica la información</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-4 grid grid-cols-[15px_1fr] items-start pb-1 last:mb-0 last:pb-0">
+            <span className="flex h-2 w-2 translate-y-1 rounded-full bg-primary" />
+            <div className="space-y-1">
+              <p className="text-sm font-medium leading-none">Categoria</p>
+              <p className="text-sm text-muted-foreground">{fields.category}</p>
+            </div>
+          </div>
+          <div className="mb-4 grid grid-cols-[15px_1fr] items-start pb-1 last:mb-0 last:pb-0">
+            <span className="flex h-2 w-2 translate-y-1 rounded-full bg-primary" />
+            <div className="space-y-1">
+              <p className="text-sm font-medium leading-none">
+                Cuenta de gasto
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {fields.expense_account}
+              </p>
+            </div>
+          </div>
+          <div className="mb-4 grid grid-cols-[15px_1fr] items-start pb-1 last:mb-0 last:pb-0">
+            <span className="flex h-2 w-2 translate-y-1 rounded-full bg-primary" />
+            <div className="space-y-1">
+              <p className="text-sm font-medium leading-none">
+                Cuenta de retiro
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {fields.withdrawal_account}
+              </p>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="amount">Cantidad</Label>
+            <Input type="number" {...register('amount', { required: true })} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="description">Descripción de la transacción</Label>
+            <Input
+              type="text"
+              {...register('description', { required: true })}
+            />
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-end">
+          <Button type="submit">Guarda información</Button>
+        </CardFooter>
+      </Card>
+    </form>
   );
 }
