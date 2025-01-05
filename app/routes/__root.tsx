@@ -42,7 +42,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       </head>
       <body>
         <div className="bg-background text-foreground w-full min-w-80 max-w-[430px] min-h-screen shadow-md">
-          <header className="bg-orange-100 p-4 text-center">
+          <header className="bg-blue-100 p-4 text-center">
             <h1>qol-transactions</h1>
           </header>
           <section className="p-2">{children}</section>
