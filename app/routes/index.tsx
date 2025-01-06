@@ -13,22 +13,32 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
-import { categoriesQueryOptions } from '@/repositories/firefly-fns';
+import {
+  accountsQueryOptions,
+  categoriesQueryOptions,
+} from '@/repositories/firefly-fns';
 import { useSuspenseQuery } from '@tanstack/react-query';
 
 export const Route = createFileRoute('/')({
   component: Home,
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(categoriesQueryOptions());
+    const categoriesQuery = context.queryClient.ensureQueryData(
+      categoriesQueryOptions(),
+    );
+    const expenseAccountsQuery = context.queryClient.ensureQueryData(
+      accountsQueryOptions({ type: 'expense' }),
+    );
+    const assetAccountsQuery = context.queryClient.ensureQueryData(
+      accountsQueryOptions({ type: 'asset' }),
+    );
+
+    await Promise.all([
+      categoriesQuery,
+      expenseAccountsQuery,
+      assetAccountsQuery,
+    ]);
   },
 });
-
-const accounts = [
-  { id: 1, name: 'BBVA Azul', icon: 'credit-card' },
-  { id: 2, name: 'BBVA Rojo', icon: 'credit-card' },
-  { id: 3, name: 'BBVA Negro', icon: 'credit-card' },
-  { id: 4, name: 'BBVA Morado', icon: 'credit-card' },
-];
 
 type FormData = {
   amount: string;
@@ -42,6 +52,12 @@ function Home() {
   const { register, control, watch, handleSubmit } = useForm<FormData>({});
 
   const categories = useSuspenseQuery(categoriesQueryOptions());
+  const expenseAccounts = useSuspenseQuery(
+    accountsQueryOptions({ type: 'expense' }),
+  );
+  const assetAccounts = useSuspenseQuery(
+    accountsQueryOptions({ type: 'asset' }),
+  );
 
   const fields = watch();
 
@@ -92,7 +108,7 @@ function Home() {
           render={({ field }) => {
             return (
               <div className="grid grid-cols-3 gap-4">
-                {categories.data.map((category) => (
+                {expenseAccounts.data.map((category) => (
                   <RadioButton
                     key={category.id}
                     active={field.value === category.name}
@@ -124,7 +140,7 @@ function Home() {
           render={({ field }) => {
             return (
               <div ref={field.ref} className="flex gap-2 flex-col">
-                {accounts.map((account) => (
+                {assetAccounts.data.map((account) => (
                   <RadioButton
                     key={account.id}
                     active={field.value === account.name}
