@@ -1,8 +1,8 @@
 import axios from 'axios';
 import type { AccountType } from '@/entities';
 
-const fireFlyApi = 'https://okane.kukan.cloud/api/v1';
-const fireFlyApiKey = process.env.OKANE_PT;
+const fireFlyApi = process.env.FIREFLY_API_URL;
+const fireFlyApiKey = process.env.FIREFLY_PT;
 
 const headers = {
   accept: 'application/json',
