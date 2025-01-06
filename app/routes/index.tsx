@@ -1,7 +1,4 @@
-import * as fs from 'node:fs';
-import * as React from 'react';
 import { createFileRoute } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/start';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CreditCard } from 'lucide-react';
@@ -16,37 +13,15 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Controller, type SubmitHandler, useForm } from 'react-hook-form';
-
-const filePath = 'count.txt';
-
-async function readCount() {
-  return Number.parseInt(
-    await fs.promises.readFile(filePath, 'utf-8').catch(() => '0'),
-  );
-}
-
-const getCount = createServerFn({
-  method: 'GET',
-}).handler(() => {
-  return readCount();
-});
+import { categoriesQueryOptions } from '@/repositories/firefly-fns';
+import { useSuspenseQuery } from '@tanstack/react-query';
 
 export const Route = createFileRoute('/')({
   component: Home,
-  loader: async () => await getCount(),
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(categoriesQueryOptions());
+  },
 });
-
-const categories = [
-  { id: 1, name: 'Food & Drinks', icon: 'utensils' },
-  { id: 2, name: 'Transportation', icon: 'car' },
-  { id: 3, name: 'Entertainment', icon: 'tv' },
-  { id: 4, name: 'Shopping & Retail', icon: 'shopping-bag' },
-  { id: 5, name: 'Bills & Utilities', icon: 'file-text' },
-  { id: 6, name: 'Health & Medical', icon: 'heart' },
-  { id: 7, name: 'Professional Development & Training', icon: 'briefcase' },
-  { id: 8, name: 'Educational Resources & Online Courses', icon: 'book-open' },
-  { id: 9, name: 'Personal Care & Wellness Activities', icon: 'smile' },
-];
 
 const accounts = [
   { id: 1, name: 'BBVA Azul', icon: 'credit-card' },
@@ -66,6 +41,8 @@ type FormData = {
 function Home() {
   const { register, control, watch, handleSubmit } = useForm<FormData>({});
 
+  const categories = useSuspenseQuery(categoriesQueryOptions());
+
   const fields = watch();
 
   const onSubmit: SubmitHandler<FormData> = (data) => {
@@ -84,7 +61,7 @@ function Home() {
           render={({ field }) => {
             return (
               <div className="grid grid-cols-3 gap-4">
-                {categories.map((category) => (
+                {categories.data.map((category) => (
                   <RadioButton
                     key={category.id}
                     active={field.value === category.name}
@@ -115,7 +92,7 @@ function Home() {
           render={({ field }) => {
             return (
               <div className="grid grid-cols-3 gap-4">
-                {categories.map((category) => (
+                {categories.data.map((category) => (
                   <RadioButton
                     key={category.id}
                     active={field.value === category.name}
