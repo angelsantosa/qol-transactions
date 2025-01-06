@@ -1,30 +1,33 @@
 import {
   Outlet,
   ScrollRestoration,
-  createRootRoute,
+  createRootRouteWithContext,
 } from '@tanstack/react-router';
 import { Meta, Scripts } from '@tanstack/start';
+import type { QueryClient } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import mainCss from '@/main.css?url';
 
-export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      {
-        charSet: 'utf-8',
-      },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
-      },
-      {
-        title: 'qol-transactions',
-      },
-    ],
-    links: [{ rel: 'stylesheet', href: mainCss }],
-  }),
-  component: RootComponent,
-});
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
+  {
+    head: () => ({
+      meta: [
+        {
+          charSet: 'utf-8',
+        },
+        {
+          name: 'viewport',
+          content: 'width=device-width, initial-scale=1',
+        },
+        {
+          title: 'qol-transactions',
+        },
+      ],
+      links: [{ rel: 'stylesheet', href: mainCss }],
+    }),
+    component: RootComponent,
+  },
+);
 
 function RootComponent() {
   return (
