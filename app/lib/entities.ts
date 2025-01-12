@@ -1,5 +1,5 @@
 import * as v from 'valibot';
-import { createFireflyListSchema } from './lib/utils';
+import { createFireflyListSchema } from './utils';
 
 export const FireflyAccountTypeSchema = v.union([
   v.literal('asset'),

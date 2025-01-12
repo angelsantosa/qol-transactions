@@ -4,7 +4,7 @@ import {
   FireflyAccountListSchema,
   FireflyCategorySchema,
   type FireflyAccountType,
-} from '@/entities';
+} from '@/lib/entities';
 import { checkVailbotFieldErrors } from '@/lib/utils';
 
 const fireFlyApiUrl = process.env.FIREFLY_API_URL;

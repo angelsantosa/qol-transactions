@@ -5,7 +5,13 @@ import { twMerge } from 'tailwind-merge';
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
-// response
+
+export const GenericObjectSchema = v.object({
+  id: v.string(),
+});
+
+export type GenericObject = v.InferOutput<typeof GenericObjectSchema>;
+
 export const FireflyTypeSchema = v.union([
   v.literal('accounts'),
   v.literal('transactions'),

@@ -1,4 +1,5 @@
 import {
+  Link,
   Outlet,
   ScrollRestoration,
   createRootRouteWithContext,
@@ -45,8 +46,28 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       </head>
       <body>
         <div className="bg-background text-foreground w-full min-w-80 max-w-[430px] min-h-screen shadow-md">
-          <header className="bg-blue-100 p-4 text-center">
-            <h1>qol-transactions</h1>
+          <header className="bg-blue-100 p-4 text-center flex flex-col gap-2">
+            <h1 className="text-2xl font-bold">qol-transactions</h1>
+            <nav className="flex justify-between">
+              <div>
+                <Link
+                  to="/"
+                  className="text-blue-500"
+                  activeProps={{ className: 'font-bold' }}
+                >
+                  Agregar gasto
+                </Link>
+              </div>
+              <div>
+                <Link
+                  to="/settings"
+                  className="text-blue-500"
+                  activeProps={{ className: 'font-bold' }}
+                >
+                  Configuración
+                </Link>
+              </div>
+            </nav>
           </header>
           <section className="p-2">{children}</section>
         </div>

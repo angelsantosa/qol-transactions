@@ -5,7 +5,10 @@ import {
   fetchFireFlyAccounts,
   fetchFireflyCategories,
 } from './firefly-services';
-import { FireflyAccountTypeSchema, type FireflyAccountType } from '@/entities';
+import {
+  FireflyAccountTypeSchema,
+  type FireflyAccountType,
+} from '@/lib/entities';
 
 export const fetchCategories = createServerFn({ method: 'GET' }).handler(
   async () => {
