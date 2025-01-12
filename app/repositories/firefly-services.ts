@@ -7,17 +7,17 @@ import {
 } from '@/entities';
 import { checkVailbotFieldErrors } from '@/lib/utils';
 
-const fireFlyApi = process.env.FIREFLY_API_URL;
-const fireFlyApiKey = process.env.FIREFLY_PT;
+const fireFlyApiUrl = process.env.FIREFLY_API_URL;
+const fireFlyPersonalToken = process.env.FIREFLY_PERSONAL_TOKEN;
 
 const headers = {
   accept: 'application/json',
   'content-type': 'application/json',
-  authorization: `Bearer ${fireFlyApiKey}`,
+  authorization: `Bearer ${fireFlyPersonalToken}`,
 };
 
 export const fetchFireflyCategories = async () => {
-  const request = await axios.get(`${fireFlyApi}/categories`, {
+  const request = await axios.get(`${fireFlyApiUrl}/categories`, {
     headers,
   });
   try {
@@ -28,11 +28,15 @@ export const fetchFireflyCategories = async () => {
   }
 };
 
-export const fetchFireFlyAccounts = async (params: {
+export const fetchFireFlyAccounts = async ({
+  type,
+}: {
   type: FireflyAccountType;
 }) => {
-  const request = await axios.get(`${fireFlyApi}/accounts`, {
-    params,
+  const request = await axios.get(`${fireFlyApiUrl}/accounts`, {
+    params: {
+      type,
+    },
     headers,
   });
   try {
