@@ -18,6 +18,8 @@ import {
   categoriesQueryOptions,
 } from '@/repositories/firefly-fns';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import type { FireflyAccountType } from '@/entities';
+import React from 'react';
 
 export const Route = createFileRoute('/')({
   component: Home,
@@ -51,11 +53,13 @@ type FormData = {
 function Home() {
   const { register, control, watch, handleSubmit } = useForm<FormData>({});
 
-  const categories = useSuspenseQuery(categoriesQueryOptions());
-  const expenseAccounts = useSuspenseQuery(
-    accountsQueryOptions({ type: 'expense' }),
+  const [myType, setMytype] = React.useState<FireflyAccountType>('expense');
+
+  const { data: categories } = useSuspenseQuery(categoriesQueryOptions());
+  const { data: expenseAccounts } = useSuspenseQuery(
+    accountsQueryOptions({ type: myType }),
   );
-  const assetAccounts = useSuspenseQuery(
+  const { data: assetAccounts } = useSuspenseQuery(
     accountsQueryOptions({ type: 'asset' }),
   );
 
@@ -77,15 +81,15 @@ function Home() {
           render={({ field }) => {
             return (
               <div className="grid grid-cols-3 gap-4">
-                {categories.data.map((category) => (
+                {categories.map((category) => (
                   <RadioButton
                     key={category.id}
-                    active={field.value === category.name}
+                    active={field.value === category.attributes.name}
                     onClick={() => {
-                      field.onChange(category.name);
+                      field.onChange(category.attributes.name);
                     }}
                     icon={<CreditCard />}
-                    value={category.name}
+                    value={category.attributes.name}
                     name="category"
                   />
                 ))}
@@ -108,15 +112,16 @@ function Home() {
           render={({ field }) => {
             return (
               <div className="grid grid-cols-3 gap-4">
-                {expenseAccounts.data.map((category) => (
+                <Button onClick={() => setMytype('liability')}>Gastos</Button>
+                {expenseAccounts.map((account) => (
                   <RadioButton
-                    key={category.id}
-                    active={field.value === category.name}
+                    key={account.id}
+                    active={field.value === account.attributes.name}
                     onClick={() => {
-                      field.onChange(category.name);
+                      field.onChange(account.attributes.name);
                     }}
                     icon={<CreditCard />}
-                    value={category.name}
+                    value={account.attributes.name}
                     name="expense_account"
                   />
                 ))}
@@ -140,15 +145,15 @@ function Home() {
           render={({ field }) => {
             return (
               <div ref={field.ref} className="flex gap-2 flex-col">
-                {assetAccounts.data.map((account) => (
+                {assetAccounts.map((account) => (
                   <RadioButton
                     key={account.id}
-                    active={field.value === account.name}
+                    active={field.value === account.attributes.name}
                     onClick={() => {
-                      field.onChange(account.name);
+                      field.onChange(account.attributes.name);
                     }}
                     icon={<CreditCard />}
-                    value={account.name}
+                    value={account.attributes.name}
                     orientation="horizontal"
                     name="withdrawal_account"
                   />

@@ -1,49 +1,68 @@
-import z from 'zod';
+import * as v from 'valibot';
+import { createFireflyListSchema } from './lib/utils';
 
-export const accountTypeSchema = z.enum([
-  'expense',
-  'asset',
-  'liability',
-  'all',
+export const FireflyAccountTypeSchema = v.union([
+  v.literal('asset'),
+  v.literal('expense'),
+  v.literal('import'),
+  v.literal('revenue'),
+  v.literal('cash'),
+  v.literal('liability'),
+  v.literal('liabilities'),
+  v.literal('initial-balance'),
+  v.literal('reconciliation'),
 ]);
 
-export type AccountType = z.infer<typeof accountTypeSchema>;
+export type FireflyAccountType = v.InferOutput<typeof FireflyAccountTypeSchema>;
 
-export type FireflyCategories = {
-  data: {
-    id: string;
-    attributes: { name: string };
-    links: { self: string };
-  }[];
-};
+export const FireflyLiabilityDirectionSchema = v.union([
+  v.literal('credit'),
+  v.literal('debit'),
+  v.null(),
+]);
 
-export const categorySchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  link: z.string(),
-});
+export const FireflyCategorySchema = createFireflyListSchema(
+  v.object({
+    notes: v.nullable(v.string()),
+    spent: v.array(
+      v.object({
+        currency_id: v.string(),
+        currency_code: v.string(),
+        currency_symbol: v.string(),
+        currency_decimal_places: v.number(),
+        sum: v.string(),
+      }),
+    ),
+    earned: v.array(
+      v.object({
+        currency_id: v.string(),
+        currency_code: v.string(),
+        currency_symbol: v.string(),
+        currency_decimal_places: v.number(),
+        sum: v.string(),
+      }),
+    ),
+  }),
+);
 
-export type Category = z.infer<typeof categorySchema>;
+export type FireflyCategory = v.InferOutput<typeof FireflyCategorySchema>;
 
-export type FireFlyAccounts = {
-  data: {
-    id: string;
-    attributes: {
-      name: string;
-      type: AccountType;
-      current_balance: string;
-      virtual_balance: string;
-    };
-    links: { self: string };
-  }[];
-};
+export const FireflyAccountListSchema = createFireflyListSchema(
+  v.object({
+    type: FireflyAccountTypeSchema,
+    active: v.boolean(),
+    order: v.nullable(v.number()),
+    currency_code: v.string(),
+    currency_symbol: v.string(),
+    current_balance: v.string(),
+    current_balance_date: v.string(),
+    opening_balance: v.string(),
+    current_debt: v.nullable(v.string()),
+    virtual_balance: v.string(),
+    liability_type: v.nullable(v.string()),
+    liability_direction: v.nullable(FireflyLiabilityDirectionSchema),
+    notes: v.nullable(v.string()),
+  }),
+);
 
-export const accountSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  type: accountTypeSchema,
-  current_balance: z.string(),
-  virtual_balance: z.string(),
-});
-
-export type Account = z.infer<typeof accountSchema>;
+export type FireflyAccountList = v.InferOutput<typeof FireflyAccountListSchema>;
