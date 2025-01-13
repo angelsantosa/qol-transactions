@@ -1,6 +1,6 @@
 import * as v from 'valibot';
 import { createServerFn } from '@tanstack/start';
-import { db } from '@/db';
+import { getDb } from '@/db';
 import { categorySettingsTable } from '@/db/schema';
 import { GenericObjectSchema } from '@/lib/utils';
 import { queryOptions } from '@tanstack/react-query';
@@ -12,6 +12,7 @@ export const settingsQueryKey = {
 
 const fetchCategorySettings = createServerFn({ method: 'GET' }).handler(
   async () => {
+    const db = getDb();
     const settings = await db.select().from(categorySettingsTable);
     return settings.map((s) => {
       const parse = v.safeParse(
@@ -43,6 +44,7 @@ export const setCategoryAccounts = createServerFn({
     v.parse(SetCategoryAccountsSchema, params),
   )
   .handler(async ({ data: { category_id, expense_accounts } }) => {
+    const db = getDb();
     await db
       .insert(categorySettingsTable)
       .values({
