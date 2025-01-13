@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const GenericObjectSchema = v.object({
-  id: v.string(),
+  object_id: v.string(),
 });
 
 export type GenericObject = v.InferOutput<typeof GenericObjectSchema>;

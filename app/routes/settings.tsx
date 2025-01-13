@@ -3,18 +3,15 @@ import {
   accountsQueryOptions,
   categoriesQueryOptions,
 } from '@/repositories/firefly-fns';
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { useForm } from 'react-hook-form';
-import {
-  categorySettingsQueryOptions,
-  setCategoryAccounts,
-} from '@/repositories/categories-fns';
+import { categorySettingsQueryOptions } from '@/repositories/categories-fns';
+import CategoryAccountsForm from '@/components/CategoryAccountsForm';
 
 export const Route = createFileRoute('/settings')({
   component: RouteComponent,
@@ -25,7 +22,6 @@ export const Route = createFileRoute('/settings')({
     const expenseAccountsQuery = context.queryClient.ensureQueryData(
       accountsQueryOptions({ type: 'expense' }),
     );
-
     const categorySettingsQuery = context.queryClient.ensureQueryData(
       categorySettingsQueryOptions(),
     );
@@ -45,14 +41,6 @@ function RouteComponent() {
     categorySettingsQueryOptions(),
   );
 
-  const { mutate } = useMutation({
-    mutationFn: setCategoryAccounts,
-  });
-
-  // const { control, handleSubmit, register } = useForm<CategoryHierarchy>({
-  //   defaultValues: categorySettings,
-  // });
-
   return (
     <div className="flex flex-col gap-4">
       <h2 className="text-xl font-bold">Configuración</h2>
@@ -67,8 +55,10 @@ function RouteComponent() {
               <AccordionItem value={category.id} key={category.id}>
                 <AccordionTrigger>{category.attributes.name}</AccordionTrigger>
                 <AccordionContent>
-                  <h4 className="text-sm font-bold">Jerarquia</h4>
-                  <p>{JSON.stringify(settings)}</p>
+                  <CategoryAccountsForm
+                    category_id={category.id}
+                    expense_accounts={settings?.expense_accounts ?? []}
+                  />
                 </AccordionContent>
               </AccordionItem>
             );

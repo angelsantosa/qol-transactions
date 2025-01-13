@@ -1,4 +1,3 @@
-import React from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,7 +18,6 @@ import {
   categoriesQueryOptions,
 } from '@/repositories/firefly-fns';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import type { FireflyAccountType } from '@/lib/entities';
 
 export const Route = createFileRoute('/')({
   component: Home,
@@ -53,11 +51,9 @@ type FormData = {
 function Home() {
   const { register, control, watch, handleSubmit } = useForm<FormData>({});
 
-  const [myType, setMytype] = React.useState<FireflyAccountType>('expense');
-
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions());
   const { data: expenseAccounts } = useSuspenseQuery(
-    accountsQueryOptions({ type: myType }),
+    accountsQueryOptions({ type: 'expense' }),
   );
   const { data: assetAccounts } = useSuspenseQuery(
     accountsQueryOptions({ type: 'asset' }),
@@ -71,8 +67,8 @@ function Home() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <h2 className="text-xl font-bold">Nuevo gasto</h2>
-      <div className="space-y-2">
+      <h2 className="text-2xl">Nuevo gasto</h2>
+      <div className="space-y-3">
         <Label htmlFor="category">Categoria</Label>
         <Controller
           name="category"
@@ -112,10 +108,6 @@ function Home() {
           render={({ field }) => {
             return (
               <div className="grid grid-cols-3 gap-4">
-                <Button type="button" onClick={() => setMytype('liability')}>
-                  Gastos
-                </Button>
-
                 {expenseAccounts.map((account) => (
                   <RadioButton
                     key={account.id}

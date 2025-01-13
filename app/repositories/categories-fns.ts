@@ -5,18 +5,25 @@ import { categorySettingsTable } from '@/db/schema';
 import { GenericObjectSchema } from '@/lib/utils';
 import { queryOptions } from '@tanstack/react-query';
 
+export const settingsQueryKey = {
+  all: () => ['settings'],
+  category: () => [...settingsQueryKey.all(), 'category'],
+};
+
 const fetchCategorySettings = createServerFn({ method: 'GET' }).handler(
   async () => {
     const settings = await db.select().from(categorySettingsTable);
-    const parsedSettings = settings.map((s) => {
-      const parse = v.safeParse(GenericObjectSchema, s.expense_accounts);
+    return settings.map((s) => {
+      const parse = v.safeParse(
+        v.array(GenericObjectSchema),
+        s.expense_accounts,
+      );
       const expense_accounts = parse.success ? parse.output : [];
       return {
         ...s,
         expense_accounts,
       };
     });
-    return parsedSettings;
   },
 );
 
@@ -25,7 +32,9 @@ const SetCategoryAccountsSchema = v.object({
   expense_accounts: v.array(GenericObjectSchema),
 });
 
-type SetCategoryAccounts = v.InferOutput<typeof SetCategoryAccountsSchema>;
+export type SetCategoryAccounts = v.InferOutput<
+  typeof SetCategoryAccountsSchema
+>;
 
 export const setCategoryAccounts = createServerFn({
   method: 'POST',
@@ -48,6 +57,6 @@ export const setCategoryAccounts = createServerFn({
 
 export const categorySettingsQueryOptions = () =>
   queryOptions({
-    queryKey: ['settings', 'categories'],
+    queryKey: settingsQueryKey.category(),
     queryFn: () => fetchCategorySettings(),
   });
