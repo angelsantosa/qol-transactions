@@ -17,7 +17,9 @@ import {
   accountsQueryOptions,
   categoriesQueryOptions,
 } from '@/repositories/firefly-fns';
+import { categorySettingsQueryOptions } from '@/repositories/categories-fns';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import * as React from 'react';
 
 export const Route = createFileRoute('/')({
   component: Home,
@@ -32,10 +34,15 @@ export const Route = createFileRoute('/')({
       accountsQueryOptions({ type: 'asset' }),
     );
 
+    const categorySettingsQuery = context.queryClient.ensureQueryData(
+      categorySettingsQueryOptions(),
+    );
+
     await Promise.all([
       categoriesQuery,
       expenseAccountsQuery,
       assetAccountsQuery,
+      categorySettingsQuery,
     ]);
   },
 });
@@ -59,7 +66,32 @@ function Home() {
     accountsQueryOptions({ type: 'asset' }),
   );
 
+  const { data: categorySettings } = useSuspenseQuery(
+    categorySettingsQueryOptions(),
+  );
+
+  const categorySettingsIds = categorySettings.map((setting) => setting.id);
+
   const fields = watch();
+
+  const expenseAccountsFiltered = React.useMemo(() => {
+    if (!fields.category || categorySettingsIds.length === 0)
+      return expenseAccounts;
+
+    const foundCategory = categorySettings.find(
+      (setting) => setting.id === fields.category,
+    );
+
+    if (!foundCategory) return expenseAccounts;
+
+    const assignedAccounts = foundCategory.expense_accounts.map(
+      (account) => account.object_id,
+    );
+
+    return expenseAccounts.filter((account) =>
+      assignedAccounts.includes(account.id),
+    );
+  }, [expenseAccounts, categorySettings, categorySettingsIds, fields.category]);
 
   const onSubmit: SubmitHandler<FormData> = (data) => {
     console.log(data);
@@ -80,9 +112,9 @@ function Home() {
                 {categories.map((category) => (
                   <RadioButton
                     key={category.id}
-                    active={field.value === category.attributes.name}
+                    active={field.value === category.id}
                     onClick={() => {
-                      field.onChange(category.attributes.name);
+                      field.onChange(category.id);
                     }}
                     icon={<CreditCard />}
                     value={category.attributes.name}
@@ -108,7 +140,7 @@ function Home() {
           render={({ field }) => {
             return (
               <div className="grid grid-cols-3 gap-4">
-                {expenseAccounts.map((account) => (
+                {expenseAccountsFiltered.map((account) => (
                   <RadioButton
                     key={account.id}
                     active={field.value === account.attributes.name}
