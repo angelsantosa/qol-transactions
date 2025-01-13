@@ -67,6 +67,7 @@ const WithdrawalDetailFields = () => {
                       onChange(date.toISOString());
                     }}
                     initialFocus
+                    toDate={new Date()}
                   />
                 </PopoverContent>
               </Popover>

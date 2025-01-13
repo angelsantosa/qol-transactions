@@ -28,7 +28,10 @@ const WithdrawalAssetAccountField = () => {
         rules={{ required: true }}
         render={({ field }) => {
           return (
-            <div ref={field.ref} className="flex gap-2 flex-col">
+            <div
+              ref={field.ref}
+              className="flex gap-2 flex-col max-h-96 overflow-y-auto"
+            >
               {assetAccounts.map((account) => (
                 <RadioButton
                   key={account.id}
@@ -50,7 +53,7 @@ const WithdrawalAssetAccountField = () => {
         <Button
           type="button"
           onClick={() => {
-            setValue('source_id', '');
+            setValue('destination_id', '');
           }}
           variant="link"
           className="mt-2"

@@ -44,7 +44,7 @@ const CategoryAccountsForm: React.FC<SetCategoryAccounts> = (props) => {
     name: 'expense_accounts',
   });
 
-  const { mutate, isPending, isSuccess } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: setCategoryAccounts,
     onMutate: async ({ data }) => {
       const expectedCategorySetting = {

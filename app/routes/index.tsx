@@ -21,6 +21,9 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useMutation } from '@tanstack/react-query';
+import { useToast } from '@/hooks/use-toast';
+import { Checkbox } from '@/components/ui/checkbox';
+import * as React from 'react';
 
 export const Route = createFileRoute('/')({
   component: Home,
@@ -48,6 +51,10 @@ export const Route = createFileRoute('/')({
 });
 
 function Home() {
+  const { toast } = useToast();
+
+  const [createAnother, setCreateAnother] = React.useState(false);
+
   const form = useForm<FireflyTransaction>({
     defaultValues: {
       type: 'withdrawal',
@@ -55,22 +62,46 @@ function Home() {
     },
   });
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: createTransaction,
-  });
-
   const {
     watch,
     handleSubmit,
     formState: { isValid },
     reset,
+    trigger,
   } = form;
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: createTransaction,
+    onSuccess: () => {
+      toast({
+        title: 'Transacción creada',
+        variant: 'default',
+        description: 'La transacción ha sido creada correctamente',
+      });
+      if (createAnother) {
+        form.setValue('amount', '');
+        form.setValue('description', '');
+        trigger();
+      } else {
+        reset();
+      }
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        variant: 'destructive',
+        description: error.message,
+      });
+    },
+  });
 
   const fields = watch();
 
   const onSubmit: SubmitHandler<FireflyTransaction> = (data) => {
-    console.log(data);
-    // mutate({ data });
+    // remove time from date
+    const date = new Date(data.date);
+    data.date = date.toISOString().split('T')[0];
+    mutate({ data });
   };
 
   return (
@@ -93,19 +124,37 @@ function Home() {
             <CardContent>
               <WithdrawalDetailFields />
             </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button
-                onClick={() => {
-                  reset();
-                }}
-                type="button"
-                variant="secondary"
-              >
-                Reiniciar
-              </Button>
-              <Button disabled={!isValid || isPending} type="submit">
-                Crear transacción
-              </Button>
+            <CardFooter className="flex flex-col gap-2 items-start">
+              <div className="flex justify-end w-full">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="create-another"
+                    checked={createAnother}
+                    onCheckedChange={(checked) => setCreateAnother(!!checked)}
+                  />
+                  <label
+                    htmlFor="create-another"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Crear otra igual
+                  </label>
+                </div>
+              </div>
+              <div className="flex justify-between w-full">
+                <Button
+                  onClick={() => {
+                    reset();
+                  }}
+                  type="button"
+                  variant="secondary"
+                >
+                  Reiniciar
+                </Button>
+
+                <Button disabled={!isValid || isPending} type="submit">
+                  Crear transacción
+                </Button>
+              </div>
             </CardFooter>
           </Card>
         ) : null}

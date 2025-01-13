@@ -71,8 +71,8 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
             </nav>
           </header>
           <section className="p-2">{children}</section>
+          <Toaster />
         </div>
-        <Toaster />
         <ScrollRestoration />
         <Scripts />
       </body>
