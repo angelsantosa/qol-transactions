@@ -4,18 +4,20 @@ import { Input } from './ui/input';
 import type { FireflyTransaction } from '@/lib/entities';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Button } from './ui/button';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Calendar } from './ui/calendar';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import {
   accountsQueryOptions,
   categoriesQueryOptions,
 } from '@/repositories/firefly-fns';
+import { generateDescription } from '@/repositories/llm-fns';
 
 const WithdrawalDetailFields = () => {
-  const { watch, register, control } = useFormContext<FireflyTransaction>();
+  const { watch, register, control, setValue } =
+    useFormContext<FireflyTransaction>();
   const fields = watch();
 
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions());
@@ -25,6 +27,14 @@ const WithdrawalDetailFields = () => {
   const { data: expenseAccounts } = useSuspenseQuery(
     accountsQueryOptions({ type: 'expense' }),
   );
+
+  const { mutate: genDescription, isPending: isGeneratingDescription } =
+    useMutation({
+      mutationFn: generateDescription,
+      onSuccess: (description) => {
+        setValue('description', description, { shouldValidate: true });
+      },
+    });
 
   const currentCategory = categories?.find(
     (category) => category.id === fields.category_id,
@@ -42,6 +52,11 @@ const WithdrawalDetailFields = () => {
     return null;
 
   const currentAmountWithdrawal = Number(fields.amount);
+
+  const currentAmountWithdrawalFormatted = `${new Intl.NumberFormat('es-MX', {
+    style: 'currency',
+    currency: currentAssetAccount.attributes.currency_code,
+  }).format(currentAmountWithdrawal)}`;
 
   const assetBalanceNumber = Number(
     currentAssetAccount.attributes.current_balance,
@@ -139,7 +154,35 @@ const WithdrawalDetailFields = () => {
       </div>
       <div className="space-y-2">
         <Label htmlFor="description">Descripción de la transacción</Label>
-        <Input type="text" {...register('description', { required: true })} />
+        <div className="flex w-full items-center">
+          <Input
+            disabled={isGeneratingDescription}
+            type="text"
+            {...register('description', { required: true })}
+          />
+          <Button
+            type="button"
+            variant={'ghost'}
+            disabled={!fields.description || isGeneratingDescription}
+            onClick={() => {
+              setValue('description', '', {
+                shouldValidate: true,
+              });
+              genDescription({
+                data: {
+                  date: fields.date,
+                  amount: currentAmountWithdrawalFormatted,
+                  category: currentCategory.attributes.name,
+                  assetAccount: currentAssetAccount.attributes.name,
+                  expenseAccount: currentExpenseAccount.attributes.name,
+                  description: fields.description,
+                },
+              });
+            }}
+          >
+            <Sparkles className="h-2 w-2" />
+          </Button>
+        </div>
       </div>
       <div className="space-y-2">
         <Label htmlFor="amount">Cantidad</Label>
