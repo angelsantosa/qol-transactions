@@ -11,7 +11,8 @@ export const settingsQueryKey = {
 };
 
 const fetchCategorySettings = createServerFn({ method: 'GET' }).handler(
-  async () => {
+  async ({ context }) => {
+    console.log('fetchCategorySettings', context);
     const db = getDb();
     const settings = await db.select().from(categorySettingsTable);
     return settings.map((s) => {
