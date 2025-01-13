@@ -1,6 +1,14 @@
 import * as v from 'valibot';
 import { createFireflyListSchema } from './utils';
 
+const FireflyTransactionType = v.union([
+  v.literal('withdrawal'),
+  v.literal('deposit'),
+  v.literal('transfer'),
+  v.literal('reconciliation'),
+  v.literal('opening_balance'),
+]);
+
 export const FireflyAccountTypeSchema = v.union([
   v.literal('asset'),
   v.literal('expense'),
@@ -66,3 +74,15 @@ export const FireflyAccountListSchema = createFireflyListSchema(
 );
 
 export type FireflyAccountList = v.InferOutput<typeof FireflyAccountListSchema>;
+
+export const FireflyTransactionSchema = v.object({
+  type: FireflyTransactionType,
+  date: v.string(), // example: 2018-09-17T12:46:47+01:00
+  amount: v.string(),
+  description: v.string(),
+  category_id: v.string(),
+  source_id: v.string(),
+  destination_id: v.string(),
+});
+
+export type FireflyTransaction = v.InferOutput<typeof FireflyTransactionSchema>;

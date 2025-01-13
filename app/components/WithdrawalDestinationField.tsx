@@ -7,10 +7,11 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { accountsQueryOptions } from '@/repositories/firefly-fns';
 import { ArrowLeft, CreditCard } from 'lucide-react';
 import { Button } from './ui/button';
+import type { FireflyTransaction } from '@/lib/entities';
 
 const WithdrawalExpenseAccountField = () => {
-  const { control, watch, setValue } = useFormContext();
-  const categoryField = watch('category');
+  const { control, watch, setValue } = useFormContext<FireflyTransaction>();
+  const categoryIdField = watch('category_id');
 
   const { data: expenseAccounts } = useSuspenseQuery(
     accountsQueryOptions({ type: 'expense' }),
@@ -21,11 +22,11 @@ const WithdrawalExpenseAccountField = () => {
   const categorySettingsIds = categorySettings.map((setting) => setting.id);
 
   const expenseAccountsFiltered = React.useMemo(() => {
-    if (!categoryField || categorySettingsIds.length === 0)
+    if (!categoryIdField || categorySettingsIds.length === 0)
       return expenseAccounts;
 
     const foundCategory = categorySettings.find(
-      (setting) => setting.id === categoryField,
+      (setting) => setting.id === categoryIdField,
     );
 
     if (!foundCategory) return expenseAccounts;
@@ -37,7 +38,7 @@ const WithdrawalExpenseAccountField = () => {
     return expenseAccounts.filter((account) =>
       assignedAccounts.includes(account.id),
     );
-  }, [expenseAccounts, categorySettings, categorySettingsIds, categoryField]);
+  }, [expenseAccounts, categorySettings, categorySettingsIds, categoryIdField]);
 
   return (
     <div className="space-y-3">
@@ -48,7 +49,7 @@ const WithdrawalExpenseAccountField = () => {
         </p>
       </div>
       <Controller
-        name="expense_account"
+        name="destination_id"
         control={control}
         rules={{ required: true }}
         render={({ field }) => {
@@ -57,13 +58,12 @@ const WithdrawalExpenseAccountField = () => {
               {expenseAccountsFiltered.map((account) => (
                 <RadioButton
                   key={account.id}
-                  active={field.value === account.attributes.name}
+                  active={field.value === account.id}
                   onClick={() => {
-                    field.onChange(account.attributes.name);
+                    field.onChange(account.id);
                   }}
                   icon={<CreditCard />}
                   value={account.attributes.name}
-                  name="expense_account"
                 />
               ))}
             </div>
@@ -74,7 +74,7 @@ const WithdrawalExpenseAccountField = () => {
         <Button
           type="button"
           onClick={() => {
-            setValue('category', null);
+            setValue('category_id', '');
           }}
           variant="link"
           className="mt-2"

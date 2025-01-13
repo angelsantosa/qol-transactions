@@ -4,16 +4,17 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { categoriesQueryOptions } from '@/repositories/firefly-fns';
 import { CreditCard } from 'lucide-react';
 import { RadioButton } from './ui/radio-button';
+import type { FireflyTransaction } from '@/lib/entities';
 
 const CategoryWithdrawalField = () => {
-  const { control } = useFormContext();
+  const { control } = useFormContext<FireflyTransaction>();
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions());
 
   return (
     <div className="space-y-3">
       <Label htmlFor="category">Categoria</Label>
       <Controller
-        name="category"
+        name="category_id"
         control={control}
         rules={{ required: true }}
         render={({ field }) => {
@@ -28,7 +29,6 @@ const CategoryWithdrawalField = () => {
                   }}
                   icon={<CreditCard />}
                   value={category.attributes.name}
-                  name="category"
                 />
               ))}
             </div>

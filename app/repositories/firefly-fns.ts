@@ -2,11 +2,14 @@ import * as v from 'valibot';
 import { createServerFn } from '@tanstack/start';
 import { queryOptions } from '@tanstack/react-query';
 import {
+  createFireflyTransaction,
   fetchFireFlyAccounts,
   fetchFireflyCategories,
 } from './firefly-services';
 import {
   FireflyAccountTypeSchema,
+  type FireflyTransaction,
+  FireflyTransactionSchema,
   type FireflyAccountType,
 } from '@/lib/entities';
 
@@ -35,4 +38,12 @@ export const accountsQueryOptions = ({ type }: { type: FireflyAccountType }) =>
   queryOptions({
     queryKey: ['accounts', type],
     queryFn: () => fetchAccounts({ data: type }),
+  });
+
+export const createTransaction = createServerFn({ method: 'POST' })
+  .validator((transaction: FireflyTransaction) =>
+    v.parse(FireflyTransactionSchema, transaction),
+  )
+  .handler(async ({ data: transaction }) => {
+    await createFireflyTransaction(transaction);
   });

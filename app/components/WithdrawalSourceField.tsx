@@ -5,9 +5,10 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { accountsQueryOptions } from '@/repositories/firefly-fns';
 import { ArrowLeft, CreditCard } from 'lucide-react';
 import { Button } from './ui/button';
+import type { FireflyTransaction } from '@/lib/entities';
 
 const WithdrawalAssetAccountField = () => {
-  const { control, setValue } = useFormContext();
+  const { control, setValue } = useFormContext<FireflyTransaction>();
 
   const { data: assetAccounts } = useSuspenseQuery(
     accountsQueryOptions({ type: 'asset' }),
@@ -22,7 +23,7 @@ const WithdrawalAssetAccountField = () => {
         </p>
       </div>
       <Controller
-        name="withdrawal_account"
+        name="source_id"
         control={control}
         rules={{ required: true }}
         render={({ field }) => {
@@ -31,9 +32,9 @@ const WithdrawalAssetAccountField = () => {
               {assetAccounts.map((account) => (
                 <RadioButton
                   key={account.id}
-                  active={field.value === account.attributes.name}
+                  active={field.value === account.id}
                   onClick={() => {
-                    field.onChange(account.attributes.name);
+                    field.onChange(account.id);
                   }}
                   icon={<CreditCard />}
                   value={account.attributes.name}
@@ -49,7 +50,7 @@ const WithdrawalAssetAccountField = () => {
         <Button
           type="button"
           onClick={() => {
-            setValue('expense_account', null);
+            setValue('source_id', '');
           }}
           variant="link"
           className="mt-2"

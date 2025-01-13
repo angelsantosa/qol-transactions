@@ -3,6 +3,7 @@ import axios from 'axios';
 import {
   FireflyAccountListSchema,
   FireflyCategorySchema,
+  type FireflyTransaction,
   type FireflyAccountType,
 } from '@/lib/entities';
 import { checkVailbotFieldErrors } from '@/lib/utils';
@@ -45,4 +46,19 @@ export const fetchFireFlyAccounts = async ({
     if (v.isValiError(error)) throw checkVailbotFieldErrors(error);
     throw error;
   }
+};
+
+export const createFireflyTransaction = async (
+  transaction: FireflyTransaction,
+) => {
+  const request = await axios.post(
+    `${fireFlyApiUrl}/transactions`,
+    {
+      transactions: [transaction],
+    },
+    {
+      headers,
+    },
+  );
+  return request.status;
 };
