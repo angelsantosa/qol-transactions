@@ -11,6 +11,6 @@ This is an app for better handling transactions using FireFly III API.
 - [x] create a new transaction fns and mutation
 - [ ] either check a way to auth (oauth, authentik) or make the user manually add their ffiii token
 - [ ] deploy to cloudflare
-- [ ] generate with ai description
+- [x] generate with ai description
 - [x] check validations
 - [x] handle errors
