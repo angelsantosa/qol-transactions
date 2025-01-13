@@ -8,17 +8,77 @@ import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Calendar } from './ui/calendar';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import {
+  accountsQueryOptions,
+  categoriesQueryOptions,
+} from '@/repositories/firefly-fns';
 
 const WithdrawalDetailFields = () => {
   const { watch, register, control } = useFormContext<FireflyTransaction>();
   const fields = watch();
+
+  const { data: categories } = useSuspenseQuery(categoriesQueryOptions());
+  const { data: assetAccounts } = useSuspenseQuery(
+    accountsQueryOptions({ type: 'asset' }),
+  );
+  const { data: expenseAccounts } = useSuspenseQuery(
+    accountsQueryOptions({ type: 'expense' }),
+  );
+
+  const currentCategory = categories?.find(
+    (category) => category.id === fields.category_id,
+  );
+
+  const currentAssetAccount = assetAccounts?.find(
+    (account) => account.id === fields.source_id,
+  );
+
+  const currentExpenseAccount = expenseAccounts?.find(
+    (account) => account.id === fields.destination_id,
+  );
+
+  if (!currentCategory || !currentAssetAccount || !currentExpenseAccount)
+    return null;
+
+  const currentAmountWithdrawal = Number(fields.amount);
+
+  const assetBalanceNumber = Number(
+    currentAssetAccount.attributes.current_balance,
+  );
+
+  const assetAmountBeforeWithdrawal =
+    assetBalanceNumber - currentAmountWithdrawal;
+
+  const assetAmountBeforeWithdrawalFormatted = `${new Intl.NumberFormat(
+    'es-MX',
+    {
+      style: 'currency',
+      currency: currentAssetAccount.attributes.currency_code,
+    },
+  ).format(
+    assetAmountBeforeWithdrawal,
+  )} ${currentAssetAccount.attributes.currency_code}`;
+
+  // const expenseAmountBeforeWithdrawal =
+  //   expenseBalanceNumber + currentAmountWithdrawal;
+
+  const assetAccountBalance = `${new Intl.NumberFormat('es-MX', {
+    style: 'currency',
+    currency: currentAssetAccount.attributes.currency_code,
+  }).format(
+    assetBalanceNumber,
+  )} ${currentAssetAccount.attributes.currency_code}`;
+
   return (
     <>
       <div className="mb-4 grid grid-cols-[15px_1fr] items-start pb-1 last:mb-0 last:pb-0">
         <span className="flex h-2 w-2 translate-y-1 rounded-full bg-primary" />
         <div className="space-y-1">
           <p className="text-sm font-medium leading-none">Categoria</p>
-          <p className="text-sm text-muted-foreground">{fields.category_id}</p>
+          <p className="text-sm text-muted-foreground">
+            {currentCategory.attributes.name}
+          </p>
         </div>
       </div>
       <div className="mb-4 grid grid-cols-[15px_1fr] items-start pb-1 last:mb-0 last:pb-0">
@@ -26,7 +86,7 @@ const WithdrawalDetailFields = () => {
         <div className="space-y-1">
           <p className="text-sm font-medium leading-none">Cuenta de gasto</p>
           <p className="text-sm text-muted-foreground">
-            {fields.destination_id}
+            {`${currentExpenseAccount.attributes.name}`}
           </p>
         </div>
       </div>
@@ -34,7 +94,9 @@ const WithdrawalDetailFields = () => {
         <span className="flex h-2 w-2 translate-y-1 rounded-full bg-primary" />
         <div className="space-y-1">
           <p className="text-sm font-medium leading-none">Cuenta de retiro</p>
-          <p className="text-sm text-muted-foreground">{fields.source_id}</p>
+          <p className="text-sm text-muted-foreground">
+            {`${currentAssetAccount.attributes.name} - Disponible: ${assetAccountBalance}`}
+          </p>
         </div>
       </div>
       <div className="space-y-2">
@@ -82,6 +144,15 @@ const WithdrawalDetailFields = () => {
       <div className="space-y-2">
         <Label htmlFor="amount">Cantidad</Label>
         <Input type="number" {...register('amount', { required: true })} />
+        {fields.amount ? (
+          <div className="text-sm text-muted-foreground">
+            Nuevo saldo en{' '}
+            <span className="font-bold">
+              {currentAssetAccount.attributes.name}
+            </span>
+            : {assetAmountBeforeWithdrawalFormatted}
+          </div>
+        ) : null}
       </div>
     </>
   );

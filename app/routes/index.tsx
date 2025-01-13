@@ -51,6 +51,7 @@ export const Route = createFileRoute('/')({
 });
 
 function Home() {
+  const { queryClient } = Route.useRouteContext();
   const { toast } = useToast();
 
   const [createAnother, setCreateAnother] = React.useState(false);
@@ -85,6 +86,7 @@ function Home() {
       } else {
         reset();
       }
+      queryClient.invalidateQueries(accountsQueryOptions({ type: 'asset' }));
     },
     onError: (error) => {
       toast({

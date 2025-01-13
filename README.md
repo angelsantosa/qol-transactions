@@ -7,10 +7,10 @@ This is an app for better handling transactions using FireFly III API.
 - [x] fix accounts and cats in firafly
 - [x] constant way to map categories with icons
 - [x] improve ux so sections close as they select options
-- [ ] add a date picker to change the date of the transaction
-- [ ] create a new transaction fns and mutation
+- [x] add a date picker to change the date of the transaction
+- [x] create a new transaction fns and mutation
 - [ ] either check a way to auth (oauth, authentik) or make the user manually add their ffiii token
 - [ ] deploy to cloudflare
 - [ ] generate with ai description
-- [ ] check validations
-- [ ] handle errors
+- [x] check validations
+- [x] handle errors
