@@ -6,7 +6,7 @@
   "scripts": {
     "check": "biome check --write",
     "format": "biome format --write",
-    "dev": "vinxi dev",
+    "dev": "vinxi dev --host",
     "build": "vinxi build",
     "start": "vinxi start",
     "test": "vitest"

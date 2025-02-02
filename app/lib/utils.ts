@@ -1,6 +1,6 @@
-import * as v from 'valibot';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import * as v from "valibot";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -13,9 +13,9 @@ export const GenericObjectSchema = v.object({
 export type GenericObject = v.InferOutput<typeof GenericObjectSchema>;
 
 export const FireflyTypeSchema = v.union([
-  v.literal('accounts'),
-  v.literal('transactions'),
-  v.literal('categories'),
+  v.literal("accounts"),
+  v.literal("transactions"),
+  v.literal("categories"),
 ]);
 
 export const FireflyMetaSchema = v.object({
@@ -45,7 +45,7 @@ export const createFireflyListSchema = <
   TEntrie extends v.ObjectEntries,
   TMessage extends v.ErrorMessage<v.ObjectIssue> | undefined,
 >(
-  attributesObject: v.ObjectSchema<TEntrie, TMessage>,
+  attributesObject: v.ObjectSchema<TEntrie, TMessage>
 ) =>
   v.object({
     ...FireflyMetaSchema.entries,
@@ -56,7 +56,7 @@ export const createFireflyListSchema = <
           ...FireflyAttributesSchema.entries,
           ...attributesObject.entries,
         }),
-      }),
+      })
     ),
   });
 
@@ -64,7 +64,7 @@ export const createFireflyItemSchema = <
   TEntrie extends v.ObjectEntries,
   TMessage extends v.ErrorMessage<v.ObjectIssue> | undefined,
 >(
-  attributesObject: v.ObjectSchema<TEntrie, TMessage>,
+  attributesObject: v.ObjectSchema<TEntrie, TMessage>
 ) => {
   return v.object({
     data: v.object({
@@ -81,7 +81,7 @@ export const checkVailbotFieldErrors = (
   error: v.ValiError<
     | v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>
     | v.BaseSchemaAsync<unknown, unknown, v.BaseIssue<unknown>>
-  >,
+  >
 ): Error => {
   const formErrors: Record<string, string> = {};
   const flatIssues = v.flatten(error.issues);
@@ -92,18 +92,18 @@ export const checkVailbotFieldErrors = (
     const errorMessage = Array.isArray(errors) ? errors[0] : String(errors);
 
     // Check if this is an array-related error (contains a numeric segment)
-    const segments = path.split('.');
+    const segments = path.split(".");
     const arrayPathMatch = segments.findIndex(
-      (segment) => !Number.isNaN(Number(segment)),
+      (segment) => !Number.isNaN(Number(segment))
     );
 
     if (arrayPathMatch !== -1) {
       // Reconstruct the path pattern without the numeric index
       const pathPattern = [
         ...segments.slice(0, arrayPathMatch),
-        '[]',
+        "[]",
         ...segments.slice(arrayPathMatch + 1),
-      ].join('.');
+      ].join(".");
 
       // Only store the first occurrence of this array error pattern
       if (!arrayErrors.has(pathPattern)) {
@@ -120,10 +120,25 @@ export const checkVailbotFieldErrors = (
   }
 
   const errorMessage = `\n${Object.entries(formErrors)
-    .map(([key, value]) => `- ${key}: ${value.split(':')[1].trim()}`)
-    .join('\n')}
+    .map(([key, value]) => `- ${key}: ${value.split(":")[1].trim()}`)
+    .join("\n")}
   `;
   const returnError = new Error(errorMessage);
-  returnError.name = 'Schema Validation Error';
+  returnError.name = "Schema Validation Error";
   return returnError;
+};
+
+export const formatCurrency = ({
+  amount,
+  currency = "MXN",
+}: {
+  amount: number | string;
+  currency?: string;
+}) => {
+  const amountNumber = Number(amount);
+
+  return new Intl.NumberFormat("es-MX", {
+    style: "currency",
+    currency,
+  }).format(amountNumber);
 };

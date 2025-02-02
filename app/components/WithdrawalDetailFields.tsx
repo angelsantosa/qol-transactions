@@ -88,7 +88,7 @@ const WithdrawalDetailFields = () => {
   return (
     <>
       <div className="mb-4 grid grid-cols-[15px_1fr] items-start pb-1 last:mb-0 last:pb-0">
-        <span className="flex h-2 w-2 translate-y-1 rounded-full bg-primary" />
+        <span className="flex w-2 h-2 rounded-full translate-y-1 bg-primary" />
         <div className="space-y-1">
           <p className="text-sm font-medium leading-none">Categoria</p>
           <p className="text-sm text-muted-foreground">
@@ -97,7 +97,7 @@ const WithdrawalDetailFields = () => {
         </div>
       </div>
       <div className="mb-4 grid grid-cols-[15px_1fr] items-start pb-1 last:mb-0 last:pb-0">
-        <span className="flex h-2 w-2 translate-y-1 rounded-full bg-primary" />
+        <span className="flex w-2 h-2 rounded-full translate-y-1 bg-primary" />
         <div className="space-y-1">
           <p className="text-sm font-medium leading-none">Cuenta de gasto</p>
           <p className="text-sm text-muted-foreground">
@@ -106,7 +106,7 @@ const WithdrawalDetailFields = () => {
         </div>
       </div>
       <div className="mb-4 grid grid-cols-[15px_1fr] items-start pb-1 last:mb-0 last:pb-0">
-        <span className="flex h-2 w-2 translate-y-1 rounded-full bg-primary" />
+        <span className="flex w-2 h-2 rounded-full translate-y-1 bg-primary" />
         <div className="space-y-1">
           <p className="text-sm font-medium leading-none">Cuenta de retiro</p>
           <p className="text-sm text-muted-foreground">
@@ -135,7 +135,7 @@ const WithdrawalDetailFields = () => {
                     {date ? format(date, 'PPP') : <span>Pick a date</span>}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="p-0 w-auto" align="start">
                   <Calendar
                     mode="single"
                     selected={date}
@@ -154,7 +154,7 @@ const WithdrawalDetailFields = () => {
       </div>
       <div className="space-y-2">
         <Label htmlFor="description">Descripción de la transacción</Label>
-        <div className="flex w-full items-center">
+        <div className="flex items-center w-full">
           <Input
             disabled={isGeneratingDescription}
             type="text"
@@ -180,7 +180,7 @@ const WithdrawalDetailFields = () => {
               });
             }}
           >
-            <Sparkles className="h-2 w-2" />
+            <Sparkles className="w-2 h-2" />
           </Button>
         </div>
       </div>
