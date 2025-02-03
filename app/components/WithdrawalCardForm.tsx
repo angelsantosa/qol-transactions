@@ -69,7 +69,6 @@ const WithdrawalCardForm = () => {
       });
       if (createAnother) {
         form.setValue("amount", "");
-        form.setValue("description", "");
         form.trigger();
       } else {
         form.reset();
@@ -400,6 +399,7 @@ const WithdrawalCardForm = () => {
               <Controller
                 control={form.control}
                 name="amount"
+                rules={{ required: true }}
                 render={({ field }) => {
                   return (
                     <CurrencyInput
@@ -454,7 +454,12 @@ const WithdrawalCardForm = () => {
                 Crear otra igual
               </label>
             </div>
-            <Button disabled={!formState.isValid || isPending} type="submit">
+            <Button
+              disabled={
+                !formState.isValid || isPending || isGeneratingDescription
+              }
+              type="submit"
+            >
               Crear transacción
             </Button>
           </div>

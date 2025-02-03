@@ -3,7 +3,8 @@
 *.local
 *.log*
 .vscode/
-
+.netlify/
+.vinxi/
 # Dist
 node_modules
 dist/
