@@ -1,24 +1,26 @@
-import * as v from 'valibot';
-import { createServerFn } from '@tanstack/start';
-import { getDb } from '@/db';
-import { categorySettingsTable } from '@/db/schema';
-import { GenericObjectSchema } from '@/lib/utils';
-import { queryOptions } from '@tanstack/react-query';
+import * as v from "valibot";
+import { createServerFn } from "@tanstack/start";
+import { getDb } from "@/db";
+import { categorySettingsTable } from "@/db/schema";
+import { GenericObjectSchema } from "@/lib/utils";
+import { queryOptions } from "@tanstack/react-query";
+import dynamicIconImports from "lucide-react/dynamicIconImports";
+
+const iconNames = Object.keys(dynamicIconImports);
 
 export const settingsQueryKey = {
-  all: () => ['settings'],
-  category: () => [...settingsQueryKey.all(), 'category'],
+  all: () => ["settings"],
+  category: () => [...settingsQueryKey.all(), "category"],
 };
 
-const fetchCategorySettings = createServerFn({ method: 'GET' }).handler(
-  async ({ context }) => {
-    console.log('fetchCategorySettings', context);
+const fetchCategorySettings = createServerFn({ method: "GET" }).handler(
+  async () => {
     const db = getDb();
     const settings = await db.select().from(categorySettingsTable);
     return settings.map((s) => {
       const parse = v.safeParse(
         v.array(GenericObjectSchema),
-        s.expense_accounts,
+        s.expense_accounts
       );
       const expense_accounts = parse.success ? parse.output : [];
       return {
@@ -26,7 +28,7 @@ const fetchCategorySettings = createServerFn({ method: 'GET' }).handler(
         expense_accounts,
       };
     });
-  },
+  }
 );
 
 const SetCategoryAccountsSchema = v.object({
@@ -39,10 +41,10 @@ export type SetCategoryAccounts = v.InferOutput<
 >;
 
 export const setCategoryAccounts = createServerFn({
-  method: 'POST',
+  method: "POST",
 })
   .validator((params: SetCategoryAccounts) =>
-    v.parse(SetCategoryAccountsSchema, params),
+    v.parse(SetCategoryAccountsSchema, params)
   )
   .handler(async ({ data: { category_id, expense_accounts } }) => {
     const db = getDb();
@@ -55,6 +57,33 @@ export const setCategoryAccounts = createServerFn({
       .onConflictDoUpdate({
         target: [categorySettingsTable.id],
         set: { id: category_id, expense_accounts },
+      });
+  });
+
+const SetCategoryIconSchema = v.object({
+  category_id: v.string(),
+  lucide_icon: v.string(),
+});
+
+export type SetCategoryIcon = v.InferOutput<typeof SetCategoryIconSchema>;
+
+export const setCategoryIcon = createServerFn({
+  method: "POST",
+})
+  .validator((params: SetCategoryIcon) =>
+    v.parse(SetCategoryIconSchema, params)
+  )
+  .handler(async ({ data: { category_id, lucide_icon } }) => {
+    const db = getDb();
+    await db
+      .insert(categorySettingsTable)
+      .values({
+        id: category_id,
+        lucide_icon,
+      })
+      .onConflictDoUpdate({
+        target: [categorySettingsTable.id],
+        set: { id: category_id, lucide_icon },
       });
   });
 

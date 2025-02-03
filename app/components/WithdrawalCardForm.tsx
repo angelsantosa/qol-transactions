@@ -1,10 +1,19 @@
 // External packages
 import React from "react";
-import { format } from "date-fns";
+import { format, isSameDay } from "date-fns";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useRouteContext } from "@tanstack/react-router";
 import { Controller, type SubmitHandler, useForm } from "react-hook-form";
-import { CalendarIcon, FolderOpenDot, Loader2, Sparkles } from "lucide-react";
+import {
+  BriefcaseBusiness,
+  CalendarCheck,
+  CalendarCog,
+  FolderOpenDot,
+  Loader2,
+  Sparkles,
+  WalletCards,
+} from "lucide-react";
+// import { DynamicIcon } from "lucide-react/dynamic";
 // UI Components
 import { Button } from "./ui/button";
 import { Calendar } from "./ui/calendar";
@@ -38,6 +47,8 @@ import {
 } from "@/repositories/firefly-fns";
 import { generateDescription } from "@/repositories/llm-fns";
 import { categorySettingsQueryOptions } from "@/repositories/categories-fns";
+import { DynamicIcon } from "lucide-react/dynamic";
+import type dynamicIconImports from "lucide-react/dynamicIconImports";
 
 const WithdrawalCardForm = () => {
   const { queryClient } = useRouteContext({ from: "__root__" });
@@ -224,17 +235,35 @@ const WithdrawalCardForm = () => {
                         <SelectValue placeholder="Selecciona una categoria" />
                       </SelectTrigger>
                       <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem
-                            key={`category-${category.id}`}
-                            value={category.id}
-                          >
-                            <div className="flex gap-2 justify-center items-center">
-                              <FolderOpenDot size={16} />{" "}
-                              <span>{category.attributes.name}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
+                        {categories.map((category) => {
+                          const foundCategory = categorySettings.find(
+                            (setting) => setting.id === category.id
+                          );
+                          return (
+                            <SelectItem
+                              key={`category-${category.id}`}
+                              value={category.id}
+                            >
+                              <div className="flex gap-2 justify-center items-center">
+                                {foundCategory?.lucide_icon ? (
+                                  <DynamicIcon
+                                    name={
+                                      foundCategory.lucide_icon as keyof typeof dynamicIconImports
+                                    }
+                                    className="text-primary"
+                                    size={16}
+                                  />
+                                ) : (
+                                  <FolderOpenDot
+                                    className="text-primary"
+                                    size={16}
+                                  />
+                                )}
+                                <span>{category.attributes.name}</span>
+                              </div>
+                            </SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                   );
@@ -268,7 +297,10 @@ const WithdrawalCardForm = () => {
                             value={expense_account.id}
                           >
                             <div className="flex gap-2 justify-center items-center">
-                              <FolderOpenDot size={16} />{" "}
+                              <BriefcaseBusiness
+                                className="text-purple-600"
+                                size={16}
+                              />{" "}
                               <span>{expense_account.attributes.name}</span>
                             </div>
                           </SelectItem>
@@ -306,7 +338,10 @@ const WithdrawalCardForm = () => {
                             value={asset_account.id}
                           >
                             <div className="flex gap-2 justify-center items-center">
-                              <FolderOpenDot size={16} />{" "}
+                              <WalletCards
+                                className="text-green-600"
+                                size={16}
+                              />{" "}
                               <span>{asset_account.attributes.name}</span>
                             </div>
                           </SelectItem>
@@ -330,6 +365,7 @@ const WithdrawalCardForm = () => {
                 name="date"
                 render={({ field: { onChange, value } }) => {
                   const date = new Date(value);
+                  const isToday = isSameDay(date, new Date());
                   return (
                     <Popover>
                       <PopoverTrigger asChild>
@@ -340,7 +376,11 @@ const WithdrawalCardForm = () => {
                             !date && "text-muted-foreground"
                           )}
                         >
-                          <CalendarIcon />
+                          {isToday ? (
+                            <CalendarCheck className="text-primary" />
+                          ) : (
+                            <CalendarCog className="text-primary" />
+                          )}
                           {date ? (
                             format(date, "PPP")
                           ) : (
@@ -387,9 +427,9 @@ const WithdrawalCardForm = () => {
                   onClick={handleGenerateDescription}
                 >
                   {isGeneratingDescription ? (
-                    <Loader2 className="w-2 h-2 animate-spin" />
+                    <Loader2 className="w-2 h-2 animate-spin text-primary" />
                   ) : (
-                    <Sparkles className="w-2 h-2" />
+                    <Sparkles className="w-2 h-2 text-yellow-300" />
                   )}
                 </Button>
               </div>
@@ -414,7 +454,7 @@ const WithdrawalCardForm = () => {
               {fields.amount && currentAssetAccount ? (
                 <div className="text-sm">
                   Nuevo saldo en{" "}
-                  <span className="font-bold text-primary">
+                  <span className="font-bold text-green-600">
                     {currentAssetAccount.attributes.name}
                   </span>
                   :{" "}

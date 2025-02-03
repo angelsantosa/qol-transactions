@@ -1,29 +1,33 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute } from "@tanstack/react-router";
 import {
   accountsQueryOptions,
   categoriesQueryOptions,
-} from '@/repositories/firefly-fns';
-import { useSuspenseQuery } from '@tanstack/react-query';
+} from "@/repositories/firefly-fns";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
-import { categorySettingsQueryOptions } from '@/repositories/categories-fns';
-import CategoryAccountsForm from '@/components/CategoryAccountsForm';
+} from "@/components/ui/accordion";
+import { categorySettingsQueryOptions } from "@/repositories/categories-fns";
+import CategoryAccountsForm from "@/components/CategoryAccountsForm";
+import CategoryDetailsForm from "@/components/CategoryDetailsForm";
+import { DynamicIcon } from "lucide-react/dynamic";
+import dynamicIconImports from "lucide-react/dynamicIconImports";
+const iconNames = Object.keys(dynamicIconImports);
 
-export const Route = createFileRoute('/settings')({
+export const Route = createFileRoute("/settings")({
   component: RouteComponent,
   loader: async ({ context }) => {
     const categoriesQuery = context.queryClient.ensureQueryData(
-      categoriesQueryOptions(),
+      categoriesQueryOptions()
     );
     const expenseAccountsQuery = context.queryClient.ensureQueryData(
-      accountsQueryOptions({ type: 'expense' }),
+      accountsQueryOptions({ type: "expense" })
     );
     const categorySettingsQuery = context.queryClient.ensureQueryData(
-      categorySettingsQueryOptions(),
+      categorySettingsQueryOptions()
     );
 
     await Promise.all([
@@ -38,7 +42,7 @@ function RouteComponent() {
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions());
 
   const { data: categorySettings } = useSuspenseQuery(
-    categorySettingsQueryOptions(),
+    categorySettingsQueryOptions()
   );
 
   return (
@@ -49,12 +53,26 @@ function RouteComponent() {
         <Accordion type="single" collapsible>
           {categories.map((category) => {
             const settings = categorySettings.find(
-              (setting) => setting.id === category.id,
+              (setting) => setting.id === category.id
             );
+
+            const iconName = !iconNames.includes(settings?.lucide_icon ?? "")
+              ? "folder-open-dot"
+              : (settings?.lucide_icon as keyof typeof dynamicIconImports);
+
             return (
               <AccordionItem value={category.id} key={category.id}>
-                <AccordionTrigger>{category.attributes.name}</AccordionTrigger>
-                <AccordionContent>
+                <AccordionTrigger>
+                  <div className="flex gap-2 items-center">
+                    <DynamicIcon name={iconName} className="text-primary" />
+                    {category.attributes.name}
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4">
+                  <CategoryDetailsForm
+                    category_id={category.id}
+                    lucide_icon={settings?.lucide_icon ?? ""}
+                  />
                   <CategoryAccountsForm
                     category_id={category.id}
                     expense_accounts={settings?.expense_accounts ?? []}
