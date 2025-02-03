@@ -15,7 +15,6 @@ import CategoryAccountsForm from "@/components/CategoryAccountsForm";
 import CategoryDetailsForm from "@/components/CategoryDetailsForm";
 import { DynamicIcon } from "lucide-react/dynamic";
 import dynamicIconImports from "lucide-react/dynamicIconImports";
-const iconNames = Object.keys(dynamicIconImports);
 
 export const Route = createFileRoute("/settings")({
   component: RouteComponent,
@@ -39,6 +38,8 @@ export const Route = createFileRoute("/settings")({
 });
 
 function RouteComponent() {
+  const iconNames = Object.keys(dynamicIconImports);
+
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions());
 
   const { data: categorySettings } = useSuspenseQuery(

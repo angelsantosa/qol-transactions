@@ -1,43 +1,32 @@
-import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { type SubmitHandler, useFieldArray, useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
+import { type SubmitHandler, useForm } from "react-hook-form";
 import {
-  setCategoryAccounts,
   setCategoryIcon,
   settingsQueryKey,
-  type SetCategoryAccounts,
 } from "@/repositories/categories-fns";
-import { accountsQueryOptions } from "@/repositories/firefly-fns";
-import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+
 import { Button } from "./ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { LucideIcon, Trash2Icon } from "lucide-react";
 import { DynamicIcon } from "lucide-react/dynamic";
 import { useToast } from "@/hooks/use-toast";
 import { useRouteContext } from "@tanstack/react-router";
-import { cn, type GenericObject } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import type { SetCategoryIcon } from "@/repositories/categories-fns";
 import dynamicIconImports from "lucide-react/dynamicIconImports";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 
-const iconNames = Object.keys(dynamicIconImports);
-
 const CategoryDetailsForm: React.FC<SetCategoryIcon> = (props) => {
   const { queryClient } = useRouteContext({ from: "__root__" });
   const { toast } = useToast();
+
+  const iconNames = Object.keys(dynamicIconImports);
 
   const { mutate, isPending } = useMutation({
     mutationFn: setCategoryIcon,
