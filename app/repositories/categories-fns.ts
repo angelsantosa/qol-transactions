@@ -4,9 +4,6 @@ import { getDb } from "@/db";
 import { categorySettingsTable } from "@/db/schema";
 import { GenericObjectSchema } from "@/lib/utils";
 import { queryOptions } from "@tanstack/react-query";
-import dynamicIconImports from "lucide-react/dynamicIconImports";
-
-const iconNames = Object.keys(dynamicIconImports);
 
 export const settingsQueryKey = {
   all: () => ["settings"],
