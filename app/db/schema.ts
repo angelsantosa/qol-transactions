@@ -1,11 +1,14 @@
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-export const categorySettingsTable = sqliteTable('category_settings', {
-  id: text('id').primaryKey(),
-  expense_accounts: text('expense_accounts', {
-    mode: 'json',
-  }).notNull(),
-  order: integer('order'),
+export const categorySettingsTable = sqliteTable("category_settings", {
+  id: text("id").primaryKey(),
+  expense_accounts: text("expense_accounts", {
+    mode: "json",
+  }),
+  order: integer("order"),
+  lucide_icon: text("lucide_icon", {
+    mode: "text",
+  }),
 });
 
 export type InsertCategorySetting = typeof categorySettingsTable.$inferInsert;

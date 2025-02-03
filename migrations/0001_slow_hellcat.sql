@@ -1,0 +1,1 @@
+ALTER TABLE `category_settings` ADD `lucide_icon` text;

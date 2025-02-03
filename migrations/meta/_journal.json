@@ -8,6 +8,20 @@
       "when": 1736720112648,
       "tag": "0000_chunky_angel",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1738562965818,
+      "tag": "0001_slow_hellcat",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1738563359363,
+      "tag": "0002_unusual_loners",
+      "breakpoints": true
     }
   ]
 }

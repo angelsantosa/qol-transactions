@@ -1,0 +1,1 @@
+ALTER TABLE `category_settings` ALTER COLUMN "expense_accounts" TO "expense_accounts" text;
